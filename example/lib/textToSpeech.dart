@@ -1,9 +1,7 @@
-
+import 'package:flutter_sound/flutter_sound.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_ibm_watson_services/flutter_ibm_watson_services.dart';
-import 'package:audioplayers/audioplayers.dart';
-
 void main() {
   runApp(MyApp());
 }
@@ -41,24 +39,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  AudioPlayer audioPlayer = AudioPlayer();
 
   final myController = TextEditingController();
+  FlutterSoundPlayer myPlayer = FlutterSoundPlayer();
+  bool myPlayerState = false;
 
   TextToSpeechCredential ttsCredential = TextToSpeechCredential(
       version: '2020-09-24',
       username: 'apikey',
-      apikey: 'jy2TV-Fl91Lo8kFqqPvevGV7I14igsj9eVY8TUrF5vTO',
+      apikey: 'Your api key',
       url:
-      'https://api.eu-gb.text-to-speech.watson.cloud.ibm.com/instances/06aa2ed1-a88b-4101-897d-c1fcaadaaf70');
+      'Your service url');
 
   TextToSpeech textToSpeech;
   IAMToken ttsOptions;
 
   void _sendMessage() async {
     await textToSpeech.createSession();
-    Uint8List byteData = await textToSpeech.sendMessage("hello");
-    await audioPlayer.playBytes(byteData);
+    Uint8List data = await textToSpeech.sendMessage(myController.text);
+    await myPlayer.startPlayer(
+      // As of May 2021, the Watson tts is on a lite plan and the quota has been used during the making of video, so there will not be any data and player throws an error.
+      // From user's perspective, they will not be impacted other than the will not be any TTS.
+        fromDataBuffer: data,
+        codec: Codec.opusWebM,
+        whenFinished: () {
+          setState(() {});
+        });
+    setState(() {});
   }
 
   @override
@@ -129,12 +136,18 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     textToSpeech = TextToSpeech(textToSpeechCredential: ttsCredential);
-
+    myPlayer.openAudioSession().then((value) {
+      setState(() {
+        myPlayerState = true;
+      });
+    });
   }
 
   @override
   void dispose() {
     myController.dispose();
+    myPlayer.closeAudioSession();
+    myPlayer = null;
     super.dispose();
   }
 
