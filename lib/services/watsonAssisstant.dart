@@ -77,46 +77,45 @@ class WatsonAssistantApiV2 {
   }
 
   Future<Null> deleteSession() async {
-      await http.delete(
-        Uri.parse(
-            '${watsonAssistantCredential.url}/v2/assistants/${watsonAssistantCredential.assistantID}/sessions/${this.sessionId}/message?version=${watsonAssistantCredential.version}'),
-        headers: {
-          "content-type": "application/json",
-        },
-      );
+    await http.delete(
+      Uri.parse(
+          '${watsonAssistantCredential.url}/v2/assistants/${watsonAssistantCredential.assistantID}/sessions/${this.sessionId}/message?version=${watsonAssistantCredential.version}'),
+      headers: {
+        "content-type": "application/json",
+      },
+    );
   }
 
   Future<WatsonAssistantResponse> sendMessage(
       String textInput, WatsonAssistantContext context) async {
-      bool enableContext = false;
-      if (textInput == 'Y') {
-        enableContext = true;
-      }
-      Map<String, dynamic> _body = {
-        "input": {
-          "message_type": "text",
-          "text": textInput,
-          "options": {"return_context": enableContext, "export": true}
+    bool enableContext = false;
+    if (textInput == 'Y') {
+      enableContext = true;
+    }
+    Map<String, dynamic> _body = {
+      "input": {
+        "message_type": "text",
+        "text": textInput,
+        "options": {"return_context": enableContext, "export": true}
+      },
+      "context": context.context
+    };
+
+    var receivedText = await http.post(
+        Uri.parse(
+            '${watsonAssistantCredential.url}/v2/assistants/${watsonAssistantCredential.assistantID}/sessions/${this.sessionId}/message?version=${watsonAssistantCredential.version}'),
+        headers: {
+          "content-type": "application/json",
+          HttpHeaders.authorizationHeader: auth
         },
-        "context": context.context
-      };
+        body: json.encode(_body));
+    Map<String, dynamic> _result = json.decode(receivedText.body);
+    var watsonResponse = _result['output']['generic'];
 
-      var receivedText = await http.post(
-          Uri.parse(
-              '${watsonAssistantCredential.url}/v2/assistants/${watsonAssistantCredential.assistantID}/sessions/${this.sessionId}/message?version=${watsonAssistantCredential.version}'),
-          headers: {
-            "content-type": "application/json",
-            HttpHeaders.authorizationHeader: auth
-          },
-          body: json.encode(_body));
-      Map<String, dynamic> _result = json.decode(receivedText.body);
-      var watsonResponse = _result['output']['generic'];
-
-      WatsonAssistantContext _context =
-      WatsonAssistantContext(context: _result['context']);
-      WatsonAssistantResponse watsonAssistantResult =
-      WatsonAssistantResponse(context: _context, result: watsonResponse);
-      return watsonAssistantResult;
-
+    WatsonAssistantContext _context =
+        WatsonAssistantContext(context: _result['context']);
+    WatsonAssistantResponse watsonAssistantResult =
+        WatsonAssistantResponse(context: _context, result: watsonResponse);
+    return watsonAssistantResult;
   }
 }

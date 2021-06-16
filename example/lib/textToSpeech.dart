@@ -1,11 +1,12 @@
-import 'package:flutter_sound/flutter_sound.dart';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_ibm_watson_services/flutter_ibm_watson_services.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+
 void main() {
   runApp(MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -33,13 +34,11 @@ class MyHomePage extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   final myController = TextEditingController();
   FlutterSoundPlayer myPlayer = FlutterSoundPlayer();
   bool myPlayerState = false;
@@ -48,8 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
       version: '2020-09-24',
       username: 'apikey',
       apikey: 'Your api key',
-      url:
-      'Your service url');
+      url: 'Your service url');
 
   TextToSpeech textToSpeech;
   IAMToken ttsOptions;
@@ -58,8 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
     await textToSpeech.createSession();
     Uint8List data = await textToSpeech.sendMessage(myController.text);
     await myPlayer.startPlayer(
-      // As of May 2021, the Watson tts is on a lite plan and the quota has been used during the making of video, so there will not be any data and player throws an error.
-      // From user's perspective, they will not be impacted other than the will not be any TTS.
+        // As of May 2021, the Watson tts is on a lite plan and the quota has been used during the making of video, so there will not be any data and player throws an error.
+        // From user's perspective, they will not be impacted other than the will not be any TTS.
         fromDataBuffer: data,
         codec: Codec.opusWebM,
         whenFinished: () {
@@ -78,9 +76,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-      ),
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -105,19 +103,19 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: myController,
               decoration: InputDecoration(
                 hintText: 'Type Here',
-                contentPadding: EdgeInsets.symmetric(
-                    vertical: 10.0, horizontal: 20.0),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(32.0)),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Colors.lightBlueAccent, width: 1.0),
+                  borderSide:
+                      BorderSide(color: Colors.lightBlueAccent, width: 1.0),
                   borderRadius: BorderRadius.all(Radius.circular(32.0)),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Colors.lightBlueAccent, width: 2.0),
+                  borderSide:
+                      BorderSide(color: Colors.lightBlueAccent, width: 2.0),
                   borderRadius: BorderRadius.all(Radius.circular(32.0)),
                 ),
               ),
@@ -150,5 +148,4 @@ class _MyHomePageState extends State<MyHomePage> {
     myPlayer = null;
     super.dispose();
   }
-
 }

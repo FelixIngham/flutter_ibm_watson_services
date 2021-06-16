@@ -3,9 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_ibm_watson_services/flutter_ibm_watson_services.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_ibm_watson_services/utils/IAMToken.dart';
-
+import 'package:http/http.dart' as http;
 
 class TextToSpeechCredential {
   String username;
@@ -43,19 +42,18 @@ class TextToSpeech {
   }
 
   Future<Uint8List> sendMessage(String textInput) async {
+    String token = this.token.accessToken;
+    var response = await http.post(
+      Uri.parse(
+          '${textToSpeechCredential.url}/v1/synthesize?access_token=$token&voice=${this.voice}'),
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer $token",
+        HttpHeaders.contentTypeHeader: "application/json",
+        'Accept': this.accept
+      },
+      body: '{\"text\":\"$textInput\"}',
+    );
 
-      String token = this.token.accessToken;
-      var response = await http.post(
-        Uri.parse('${textToSpeechCredential.url}/v1/synthesize?access_token=$token&voice=${this.voice}'),
-        headers: {
-          HttpHeaders.authorizationHeader: "Bearer $token",
-          HttpHeaders.contentTypeHeader: "application/json",
-          'Accept': this.accept
-        },
-        body: '{\"text\":\"$textInput\"}',
-      );
-
-      return response.bodyBytes;
-
+    return response.bodyBytes;
   }
 }

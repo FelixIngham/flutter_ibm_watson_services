@@ -4,8 +4,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_ibm_watson_services/flutter_ibm_watson_services.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_ibm_watson_services/utils/IAMToken.dart';
+import 'package:http/http.dart' as http;
 
 class SpeechToTextCredential {
   String username;
@@ -36,8 +36,8 @@ class SpeechToText {
 
   Future<Null> createSession() async {
     this.token = await IAMToken(
-        iamApiKey: '${speechToTextCredential.apikey}',
-        url: '${speechToTextCredential.url}')
+            iamApiKey: '${speechToTextCredential.apikey}',
+            url: '${speechToTextCredential.url}')
         .build();
     //print('STT Access Token: ${this.options.accessToken}');
   }
@@ -47,7 +47,8 @@ class SpeechToText {
     String token = this.token.accessToken;
     Uint8List bytes = await File(fileUrl).readAsBytes();
     var response = await http.post(
-      Uri.parse('${speechToTextCredential.url}/v1/recognize?access_token=$token&model=${this.model}'),
+      Uri.parse(
+          '${speechToTextCredential.url}/v1/recognize?access_token=$token&model=${this.model}'),
       headers: {
         HttpHeaders.contentTypeHeader: this.content,
       },
