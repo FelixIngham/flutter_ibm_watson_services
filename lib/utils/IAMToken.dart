@@ -16,7 +16,7 @@ class IAMToken {
 
   IAMToken({@required this.iamApiKey, @required this.url});
 
-  Future<IAMToken> build() async {
+  Future<IAMToken> retrieve() async {
     Map _body = {
       "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
       "apikey": this.iamApiKey
@@ -35,7 +35,7 @@ class IAMToken {
     Map data = json.decode(response.body);
     this.accessToken = data["access_token"];
     if (this.accessToken == null) {
-      print("AccessToken is Null, verified your Token");
+      print("AccessToken is Null, please retry");
     }
     this.refreshToken = data["refresh_token"];
     this.tokenType = data["token_type"];

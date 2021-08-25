@@ -84,11 +84,14 @@ class WatsonAssistantApiV2 {
         "content-type": "application/json",
       },
     );
+    this.sessionId = 'Expired';
   }
 
   Future<WatsonAssistantResponse> sendMessage(
       String textInput, WatsonAssistantContext context) async {
     bool enableContext = false;
+    //Include user booking details in the request if it is present. Default for
+    // all variable is set to null by Virtual assistant during the opening node.
     if (textInput == 'Y') {
       enableContext = true;
     }
@@ -100,22 +103,32 @@ class WatsonAssistantApiV2 {
       },
       "context": context.context
     };
-
-    var receivedText = await http.post(
+    // Send HHTP request and wait for reponse.
+    var response = await http.post(
         Uri.parse(
-            '${watsonAssistantCredential.url}/v2/assistants/${watsonAssistantCredential.assistantID}/sessions/${this.sessionId}/message?version=${watsonAssistantCredential.version}'),
+            '${watsonAssistantCredential.url}/v2/assistants/${watsonAssistantCredential.assistantID}'
+            '${this.sessionId}/message?version=${watsonAssistantCredential.version}'),
         headers: {
           "content-type": "application/json",
           HttpHeaders.authorizationHeader: auth
         },
         body: json.encode(_body));
-    Map<String, dynamic> _result = json.decode(receivedText.body);
-    var watsonResponse = _result['output']['generic'];
 
-    WatsonAssistantContext _context =
-        WatsonAssistantContext(context: _result['context']);
-    WatsonAssistantResponse watsonAssistantResult =
-        WatsonAssistantResponse(context: _context, result: watsonResponse);
-    return watsonAssistantResult;
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then decode reponse.
+      //Decode response and extract relevant information from the response structure
+      Map<String, dynamic> _result = json.decode(response.body);
+      var watsonResponse = _result['output']['generic'];
+      WatsonAssistantContext _context =
+          WatsonAssistantContext(context: _result['context']);
+      WatsonAssistantResponse watsonAssistantResult =
+          WatsonAssistantResponse(context: _context, result: watsonResponse);
+      return watsonAssistantResult;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Unsuccessful request');
+    }
   }
 }

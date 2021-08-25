@@ -32,12 +32,11 @@ class TextToSpeech {
     this.voice = "en-GB_JamesV3Voice",
   });
 
-//Addition to suit the need of projection
   Future<Null> createSession() async {
     this.token = await IAMToken(
             iamApiKey: '${textToSpeechCredential.apikey}',
             url: '${textToSpeechCredential.url}')
-        .build();
+        .retrieve();
     //print('TTS Access Token: ${this.token.accessToken}');
   }
 
@@ -54,6 +53,14 @@ class TextToSpeech {
       body: '{\"text\":\"$textInput\"}',
     );
 
-    return response.bodyBytes;
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then proceed.
+       return response.bodyBytes;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Unsuccessful response');
+    }
   }
 }
